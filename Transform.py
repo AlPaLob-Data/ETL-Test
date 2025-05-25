@@ -1,42 +1,50 @@
 from Extract import extract_data
 
+# Cargar los datos desde el archivo CSV
 data = extract_data('Raw_data/supermarket_sales new.csv')
 
-#Transformation dataset
-
-def normalitation_data(data):
+def normalize_data(data):
     '''
     Normalize the data by converting all string values to lowercase and removing any leading/trailing whitespace.
+    Also, convert the entire dataset into a list of dictionaries for easier manipulation.
     '''
     normalized_data = []
-    for row in data:
-        normalized_row = [item.strip().lower().replace(' ', '_') for item in row if isinstance(item, str)]
+    headers = [item.strip().lower().replace(' ', '_') for item in data[0]]
+    for row in data[1:]:
+        normalized_row = {headers[i]: value.strip().lower().replace(' ', '_') if isinstance(value, str) else value
+for i, value in enumerate(row)}
         normalized_data.append(normalized_row)
-    headers = normalized_data[0]
-    rows = normalized_data[1:]
-    transformed_data = [dict(zip(headers, row)) for row in rows]
 
-    return transformed_data
+    return normalized_data
 
 def filter_gender(data, gender='male'):
     '''
     Filter the data by gender.
     '''
-    filtered_data = [item for item in data if item['gender'] == gender]
+    filtered_data = [item for item in data if item['gender'] == gender.lower()]
     return filtered_data
 
-def transform_type(data, type_column , colunm_name):
+def transform_unit_price_type(data):
     '''
-    Transform the data based on a specific column type.
+    Transform the unit_price column to float type.
     '''
-    transform = list(map(lambda x: type_column(x[colunm_name]),  data))
-    return transform
+    transformed_data = []
+    for row in data:
+        try:
+            row['unit_price'] = float(row['unit_price'])
+        except ValueError as e:
+            print(f"Error converting unit_price: {row['unit_price']} - {e}")
+            continue
+        transformed_data.append(row)
 
+    return transformed_data
 
-print(transform_type(normalitation_data(data), float, 'unit_price'))
-transformed_data = normalitation_data(data)
+# Apply transformations
+normalized_data = normalize_data(data)
+filtered_data = filter_gender(normalized_data)
+final_data = transform_unit_price_type(filtered_data)
 
-
-print(transformed_data[:5])
+# Mostrar los primeros 5 registros del dataset final
+print(final_data)
 
 
