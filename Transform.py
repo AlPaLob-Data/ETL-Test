@@ -43,8 +43,3 @@ def transform_unit_price_type(data):
 normalized_data = normalize_data(data)
 filtered_data = filter_gender(normalized_data)
 final_data = transform_unit_price_type(filtered_data)
-
-# Mostrar los primeros 5 registros del dataset final
-print(final_data)
-
-
